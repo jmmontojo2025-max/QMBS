@@ -12,10 +12,11 @@
         :root {
             --bdo-blue: #002d72;
             --bdo-yellow: #ffc107;
-            --glass-white: rgba(255, 255, 255, 0.9);
+            --glass-white: rgba(255, 255, 255, 0.95);
             --radius-bento: 3vh;
         }
 
+        /* Prevent all scrolling and force full screen */
         html, body {
             height: 100vh;
             width: 100vw;
@@ -29,18 +30,18 @@
         body {
             display: flex;
             flex-direction: column;
-            padding: 2vh 2vw;
+            padding: 2vh;
             box-sizing: border-box;
         }
 
-        /* 1. LAYOUT GRID */
+        /* 1. LAYOUT GRID - Autosizes based on Viewport */
         .bento-grid {
             display: grid;
-            grid-template-columns: 1.8fr 1.2fr;
-            grid-template-rows: 12vh 1fr; /* Header reduced slightly */
+            grid-template-columns: 1.7fr 1.3fr;
+            grid-template-rows: 12vh 1fr;
             gap: 2vh;
-            flex: 1;
-            min-height: 0;
+            flex: 1; /* Takes all available space between header and ticker */
+            min-height: 0; /* Important for grid overflow */
         }
 
         .header-box {
@@ -50,15 +51,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 4vw;
+            padding: 0 3vw;
             box-shadow: 0 1vh 3vh rgba(0, 45, 114, 0.04);
-            border: 1px solid rgba(255,255,255,0.8);
         }
-        .header-box img { height: 7vh; width: auto; }
-        #time { font-size: 5vh; font-weight: 800; color: var(--bdo-blue); line-height: 1; font-variant-numeric: tabular-nums; }
-        #date { font-size: 1.8vh; font-weight: 600; opacity: 0.6; text-transform: uppercase; }
 
-        /* Main Hero - Now Serving */
+        .header-box img { height: 6.5vh; width: auto; object-fit: contain; }
+        #time { font-size: 5vh; font-weight: 800; color: var(--bdo-blue); line-height: 1; font-variant-numeric: tabular-nums; }
+        #date { font-size: 1.8vh; font-weight: 700; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1vh; text-align: right; }
+
+        /* NOW SERVING SECTION */
         .card-now-serving {
             background: white;
             border-radius: var(--radius-bento);
@@ -69,35 +70,38 @@
             box-shadow: 0 4vh 10vh rgba(0, 45, 114, 0.08);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
         }
 
         .radar-pulse {
             position: absolute;
-            width: 60vh; height: 60vh;
-            background: radial-gradient(circle, rgba(0, 45, 114, 0.04) 0%, transparent 70%);
+            width: 70vh; height: 70vh;
+            background: radial-gradient(circle, rgba(0, 45, 114, 0.05) 0%, transparent 70%);
             animation: pulse-radar 4s infinite ease-out;
         }
 
         .label-now-serving {
             font-size: 3vh; font-weight: 900; color: #94a3b8;
-            letter-spacing: 1.2vw; text-transform: uppercase; margin: 0; z-index: 1;
+            letter-spacing: 1vw; text-transform: uppercase; margin-bottom: -1vh; z-index: 1;
         }
 
         .ticket-number {
-            font-size: 30vh; /* Scaled for perfect fit */
+            /* Clamped sizing to ensure it doesn't overflow container width */
+            font-size: min(35vh, 25vw);
             font-weight: 900; line-height: 0.8;
-            margin: 1.5vh 0; color: var(--bdo-blue);
-            letter-spacing: -1.2vh; z-index: 1;
+            margin: 2vh 0; color: var(--bdo-blue);
+            letter-spacing: -1vh; z-index: 1;
+            text-shadow: 0 2vh 4vh rgba(0, 45, 114, 0.1);
         }
 
         .counter-badge {
             background: var(--bdo-blue); color: white;
-            padding: 1.2vh 7vh; border-radius: 1.5vh;
-            font-size: 3.5vh; font-weight: 900;
+            padding: 1.5vh 6vw; border-radius: 2vh;
+            font-size: 4vh; font-weight: 900;
             box-shadow: 0 1.5vh 3vh rgba(0, 45, 114, 0.2); z-index: 1;
         }
 
-        /* Sidebar */
+        /* UP NEXT SECTION */
         .card-up-next {
             background: var(--glass-white);
             backdrop-filter: blur(2vh);
@@ -106,85 +110,95 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
+            border: 1px solid rgba(255,255,255,0.5);
         }
 
         .sidebar-title {
-            font-size: 2.8vh; font-weight: 900; color: var(--bdo-blue);
+            font-size: 3vh; font-weight: 900; color: var(--bdo-blue);
             margin-bottom: 2vh; display: flex; align-items: center; gap: 1.5vh;
+            border-bottom: 0.3vh solid var(--bdo-yellow); padding-bottom: 1vh;
         }
 
         #waiting-list {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5vh;
-            overflow-y: auto;
+            grid-template-columns: 1fr; /* Default to 1 col for better readability */
+            gap: 1.2vh;
+            overflow-y: hidden; /* No scrollbars on TV */
             flex: 1;
         }
-        #waiting-list::-webkit-scrollbar { width: 0; }
 
         .waiting-item {
-            background: rgba(255, 255, 255, 0.6);
-            padding: 1.5vh;
-            border-radius: 1.5vh;
-            font-size: 3.5vh;
+            background: white;
+            padding: 1.8vh 2.5vh;
+            border-radius: 2vh;
+            font-size: 4.5vh; /* Large for distant viewing */
             font-weight: 800;
-            display: flex; align-items: center; gap: 1.5vh;
+            display: flex; align-items: center; justify-content: space-between;
             color: var(--bdo-blue);
+            box-shadow: 0 0.5vh 1.5vh rgba(0,0,0,0.03);
             border: 1px solid rgba(0,0,0,0.02);
+            animation: slideIn 0.5s ease-out;
         }
-        .pos-num { font-size: 1.4vh; color: #94a3b8; font-weight: 800; min-width: 2vh; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* 2. THE REFINED TICKER (RESIZED & BORDERLESS) */
+        .pos-num { font-size: 1.8vh; color: #94a3b8; font-weight: 900; opacity: 0.5; }
+
+        /* TICKER SYSTEM */
         .ticker-container {
-            height: 7vh; /* Reduced from 10vh to be more elegant */
-            min-height: 7vh;
+            height: 6vh;
+            min-height: 6vh;
             background: var(--bdo-yellow);
             color: var(--bdo-blue);
             margin-top: 2vh;
-            border-radius: 2vh;
+            border-radius: 1.5vh;
             display: flex;
             align-items: center;
             overflow: hidden;
-            border: none; /* Removed border */
-            box-shadow: 0 0.5vh 2vh rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1vh 2vh rgba(0, 0, 0, 0.05);
         }
 
         .ticker-content {
             white-space: nowrap;
             display: inline-block;
-            padding-left: 100%;
-            animation: ticker 80s linear infinite;
-            font-size: 2.2vh; /* Reduced from 3.2vh for better proportion */
-            font-weight: 700;
+            animation: ticker 60s linear infinite;
+            font-size: 2.2vh;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.1vh;
         }
-        .ticker-content strong { color: #d40000; margin-left: 4vh; }
+        .ticker-content strong { color: #d40000; margin: 0 2vw; }
 
-        /* ANIMATIONS */
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         @keyframes pulse-radar { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        .blink { animation: urgent-blink 0.6s ease-in-out 8; }
-        @keyframes urgent-blink {
-            0%, 100% { transform: scale(1); color: var(--bdo-blue); }
-            50% { transform: scale(1.03); color: #ff0000; }
+        /* RECALL ANIMATION */
+        .blink { animation: recall-blink 0.8s ease-in-out 6; }
+        @keyframes recall-blink {
+            0%, 100% { transform: scale(1); background: white; }
+            50% { transform: scale(1.05); background: #fff9e6; color: #ff0000; }
         }
 
+        /* Overlay for audio sync */
         #audioOverlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0, 45, 114, 0.98); backdrop-filter: blur(2vh);
-            z-index: 10000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: white; cursor: pointer;
+            background: var(--bdo-blue); z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;
+        }
+
+        /* Handle Portrait TVs */
+        @media (orientation: portrait) {
+            .bento-grid { grid-template-columns: 1fr; grid-template-rows: 10vh 45vh 1fr; }
+            .header-box { grid-column: span 1; }
+            .ticket-number { font-size: 20vh; }
+            #waiting-list { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
     <div id="audioOverlay" onclick="startSystem()">
-        <i class="fa-solid fa-play-circle" style="font-size: 12vh; color: var(--bdo-yellow);"></i>
-        <h1 style="font-size: 5vh; font-weight: 900; margin-top: 2vh;">START LOBBY SYSTEM</h1>
-        <p style="font-size: 2vh; opacity: 0.8;">Touch screen to sync Audio & Live Display</p>
+        <i class="fa-solid fa-play-circle" style="font-size: 10vh; color: var(--bdo-yellow); margin-bottom: 3vh;"></i>
+        <h1 style="font-size: 4vh; font-weight: 900;">ACTIVATE LOBBY DISPLAY</h1>
+        <p style="font-size: 2vh; opacity: 0.7;">Click anywhere to start visual and audio sync</p>
     </div>
 
     <div class="bento-grid">
@@ -196,7 +210,7 @@
             </div>
         </div>
 
-        <div class="card-now-serving">
+        <div class="card-now-serving" id="serving-container">
             <div class="radar-pulse"></div>
             <p class="label-now-serving">Now Serving</p>
             <div id="now-serving" class="ticket-number">---</div>
@@ -212,12 +226,13 @@
     <div class="ticker-container">
         <div class="ticker-content">
             WELCOME TO COOLAIRE CONSOLIDATED INC. • • •
-            <strong>OUR MISSION:</strong> WE ARE RESPONSIBLE FOR MAKING PEOPLE SAFE AND HEALTHY BY ENSURING THAT PRODUCTS ARE KEPT SUSTAINABLY FRESH FROM FARM TO TABLE |
-            <strong>OUR VISION:</strong> TO BE THE NUMBER ONE COLD CHAIN SUPPLIER IN THE PHILIPPINES BY PROVIDING AFFORDABLE, SUSTAINABLE, AND RELIABLE TEMPERATURE CONTROL SYSTEMS • • •
+            <strong>MISSION:</strong> RESPONSIBLE FOR MAKING PEOPLE SAFE AND HEALTHY BY ENSURING PRODUCTS ARE KEPT SUSTAINABLY FRESH • • •
+            <strong>VISION:</strong> THE NUMBER ONE COLD CHAIN SUPPLIER IN THE PHILIPPINES PROVIDING RELIABLE TEMPERATURE CONTROL SYSTEMS • • •
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
         </div>
     </div>
 
-    <audio id="dingSound" preload="auto">
+    <audio id="dingSound">
         <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
     </audio>
 
@@ -225,12 +240,12 @@
     let lastTicket = "";
     let lastCallCount = 0;
     const dingSound = document.getElementById('dingSound');
-    const nowServingEl = document.getElementById('now-serving');
-    const waitingListEl = document.getElementById('waiting-list');
 
     function startSystem() {
         document.getElementById('audioOverlay').style.display = 'none';
+        // Unlock audio for browser
         dingSound.play().then(() => { dingSound.pause(); dingSound.currentTime = 0; });
+
         setInterval(updateDisplay, 2500);
         setInterval(updateClock, 1000);
         updateDisplay();
@@ -241,43 +256,50 @@
         fetch('/api/get-latest-queue')
             .then(r => r.json())
             .then(data => {
+                const nowServingEl = document.getElementById('now-serving');
+                const servingContainer = document.getElementById('serving-container');
+                const waitingListEl = document.getElementById('waiting-list');
+
                 const isNew = data.now_serving !== lastTicket;
                 const isRecall = data.call_count > lastCallCount;
 
                 if ((isNew || isRecall) && data.now_serving !== "---") {
                     dingSound.currentTime = 0;
                     dingSound.play();
-                    nowServingEl.innerText = data.now_serving;
-                    nowServingEl.classList.remove('blink');
-                    void nowServingEl.offsetWidth;
-                    nowServingEl.classList.add('blink');
-                } else {
-                    nowServingEl.innerText = data.now_serving;
+
+                    // Trigger visual alert
+                    servingContainer.classList.remove('blink');
+                    void servingContainer.offsetWidth; // Force reflow
+                    servingContainer.classList.add('blink');
                 }
 
+                nowServingEl.innerText = data.now_serving;
+
                 let waitingHtml = "";
+                // Only show top 5-6 to prevent vertical overflow on TV
                 if (data.waiting && data.waiting.length > 0) {
-                    data.waiting.forEach((ticket, index) => {
+                    data.waiting.slice(0, 6).forEach((ticket, index) => {
                         waitingHtml += `
                             <div class="waiting-item">
-                                <span class="pos-num">${index + 1}</span>
                                 <span>${ticket}</span>
+                                <span class="pos-num">#${index + 1}</span>
                             </div>`;
                     });
                 } else {
-                    waitingHtml = '<div style="grid-column: span 2;" class="fs-4 text-muted text-center mt-5">Queue is clear.</div>';
+                    waitingHtml = '<div class="text-center mt-5" style="font-size: 3vh; opacity: 0.3; width: 100%;">No pending tickets</div>';
                 }
                 waitingListEl.innerHTML = waitingHtml;
 
                 lastTicket = data.now_serving;
                 lastCallCount = data.call_count;
-            });
+            })
+            .catch(err => console.error("API Error:", err));
     }
 
     function updateClock() {
         const now = new Date();
         document.getElementById('time').innerText = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     }
 </script>
 </body>
