@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4 page-fade-in">
+
+    <!-- 1. OPERATIONAL DASHBOARD HEADER -->
+    <div class="col-12">
+        <div class="bento-card p-4 border-0 shadow-deep d-flex flex-column flex-md-row justify-content-between align-items-center"
+             style="background: linear-gradient(135deg, #002d72 0%, #001d4a 100%); color: white;">
+
+            <div class="d-flex align-items-center mb-3 mb-md-0">
+                <div class="bg-white p-2 rounded-4 me-4 shadow-sm" style="width: 110px;">
+                    <img src="{{ url_for('static', filename='logo.png') }}" class="img-fluid" alt="Coolaire">
+                </div>
+                <div>
+                    <h2 class="fw-900 mb-0" style="letter-spacing: -1px;">Counter #1</h2>
+                    <div class="d-flex align-items-center opacity-75">
+                        <div class="pulse-dot bg-success me-2" style="width: 10px; height: 10px;"></div>
+                        <span class="small fw-bold">STAFF ON DUTY: {{ current_user.full_name.upper() }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3">
+                <div class="bg-white bg-opacity-10 px-4 py-2 rounded-4 text-center border border-white border-opacity-10">
+                    <div class="small opacity-50 fw-900 text-uppercase tracking-widest" style="font-size: 0.6rem;">Queue Load</div>
+                    <div class="fs-3 fw-900 text-warning">{{ waiting_tickets|length }}</div>
+                </div>
+                <div class="bg-white bg-opacity-10 px-4 py-2 rounded-4 text-center border border-white border-opacity-10">
+                    <div class="small opacity-50 fw-900 text-uppercase tracking-widest" style="font-size: 0.6rem;">Server Time</div>
+                    <div class="fs-3 fw-900" id="clock" style="font-variant-numeric: tabular-nums;">00:00:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ACTIVE SERVICE TERMINAL -->
+    <div class="col-lg-7">
+        <div class="bento-card p-4 h-100 border-0 shadow-deep bg-white position-relative overflow-hidden">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h6 class="text-secondary fw-900 tracking-widest mb-0"><i class="fa-solid fa-microchip me-2 text-primary"></i>ACTIVE TERMINAL</h6>
+                {% if now_serving %}
+                    <span class="badge bg-soft-success text-success px-3 py-2 rounded-pill fw-900 border border-success border-opacity-10">
+                        <i class="fa-solid fa-circle-play me-1"></i> IN-SESSION
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="py-5 rounded-5 mb-4 text-center border-0 shadow-inner position-relative"
+                 style="background: #f8fbff; border: 1px solid #e1e8f0 !important;">
+
+                {% if now_serving %}
+                    <p class="text-primary fw-900 tracking-widest small mb-0">CURRENTLY SERVING</p>
+                    <h1 class="display-1 fw-900 text-primary mb-2" style="font-size: 10rem; letter-spacing: -8px; line-height: 1;">
+                        {{ now_serving.ticket_number }}
+                    </h1>
+
+                    <div class="d-inline-block px-4 py-2 rounded-pill bg-white shadow-sm border mb-4">
+                        <h4 class="fw-900 text-dark mb-0">
+                            {% if now_serving.booking and now_serving.booking.customer %}
+                                {{ now_serving.booking.customer.full_name }}
+                            {% else %}
+                                <i class="fa-solid fa-user-secret me-2 opacity-50"></i>Walk-in Guest
+                            {% endif %}
+                        </h4>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-items-center text-muted mb-5">
+                        <div class="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-3 fw-900 me-3">
+                            <i class="fa-solid fa-stopwatch me-1"></i> <span id="serviceTimer">00:00</span>
+                        </div>
+                        <div class="small fw-bold">SESSION DURATION</div>
+                    </div>
+
+                    <div class="row g-3 px-4">
+                        <div class="col-6">
+                            <form action="/call-next" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="specific_id" value="{{ now_serving.id }}">
+                                <button type="submit" class="btn btn-warning btn-modern w-100 py-3 fw-900 shadow-sm">
+                                    <i class="fa-solid fa-bullhorn me-2"></i> RECALL
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-6">
+                            <form action="/call-next" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger btn-modern w-100 py-3 fw-900">
+                                    <i class="fa-solid fa-user-minus me-2"></i> NO-SHOW
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="py-5 opacity-50">
+                        <i class="fa-solid fa-power-off fa-5x text-muted mb-4"></i>
+                        <h2 class="fw-900 text-secondary">Terminal Standby</h2>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form action="/call-next" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary btn-modern w-100 py-4 shadow-lg fs-2 fw-900 border-0">
+                    <i class="fa-solid fa-forward-step me-3"></i> CALL NEXT
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. QUEUE FEED -->
+    <div class="col-lg-5">
+        <div class="bento-card h-100 p-4 border-0 shadow-deep bg-white">
+            <h5 class="fw-900 text-dark mb-4">Waiting Feed</h5>
+
+            <div class="queue-list pe-2" style="max-height: 550px; overflow-y: auto;">
+                {% for t in waiting_tickets %}
+                <div class="queue-item d-flex justify-content-between align-items-center p-3 mb-3 bg-white border rounded-4 shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-4 p-2 me-3 fw-900 text-center shadow-sm"
+                             style="width: 75px; min-width: 75px;
+                                    background: {{ '#e6f0ff' if 'A-' in t.ticket_number else '#f8fafc' }};
+                                    color: {{ '#002d72' if 'A-' in t.ticket_number else '#64748b' }};
+                                    border: 1px solid rgba(0,0,0,0.05); font-size: 1.2rem;">
+                            {{ t.ticket_number }}
+                        </div>
+                        <div>
+                            {% if t.booking and t.booking.customer %}
+                                <div class="fw-900 text-dark">{{ t.booking.customer.full_name }}</div>
+                                <div class="d-flex gap-1">
+                                    <span class="badge bg-primary" style="font-size: 0.6rem;">PRIORITY</span>
+                                    {# LATE CHECK: Comparing naive datetimes #}
+                                    {% if t.created_at.replace(tzinfo=None) > (t.booking.scheduled_time + timedelta(minutes=15)) %}
+                                        <span class="badge bg-danger" style="font-size: 0.6rem;">LATE</span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="fw-900 text-secondary">Walk-in Guest</div>
+                                <span class="badge bg-light text-muted border" style="font-size: 0.6rem;">GENERAL</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form action="/call-next" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="specific_id" value="{{ t.id }}">
+                        <button type="submit" class="btn btn-sm btn-primary rounded-4 px-3 fw-900">CALL</button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="text-center py-5 opacity-25">
+                    <i class="fa-solid fa-clipboard-check fa-4x mb-3"></i>
+                    <h5 class="fw-900">No Customers</h5>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .shadow-deep { box-shadow: 0 40px 100px rgba(0,0,0,0.06); }
+    .bg-soft-success { background: #e6ffed; }
+    .pulse-dot { border-radius: 50%; animation: pulse-green 2s infinite; height: 10px; width: 10px; display: inline-block; }
+    @keyframes pulse-green { 0% { transform: scale(0.95); } 70% { transform: scale(1.1); } 100% { transform: scale(0.95); } }
+</style>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    let serviceSeconds = 0;
+    {% if now_serving %}
+    setInterval(() => {
+        serviceSeconds++;
+        let mins = Math.floor(serviceSeconds / 60);
+        let secs = serviceSeconds % 60;
+        document.getElementById('serviceTimer').textContent = (mins < 10 ? "0"+mins : mins) + ":" + (secs < 10 ? "0"+secs : secs);
+    }, 1000);
+    {% endif %}
+</script>
+{% endblock %}

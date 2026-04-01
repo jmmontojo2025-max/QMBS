@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 1. FLAT PICKR ASSETS (CDN) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+
+<div class="row g-4 justify-content-center page-fade-in">
+
+    {% if current_user.is_authenticated %}
+    <!-- ==========================================
+         AUTHENTICATED VIEW: PREMIUM PICKER EXPERIENCE
+         ========================================== -->
+    <div class="col-lg-8">
+        <div class="bento-card p-4 p-md-5 bg-white border-0 shadow-deep position-relative overflow-hidden">
+            <!-- Decorative Icon -->
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i class="fa-solid fa-calendar-check fa-10x"></i>
+            </div>
+
+            <div class="position-relative" style="z-index: 1;">
+                <div class="d-flex align-items-center mb-5">
+                    <div class="bg-primary text-white rounded-4 shadow-sm d-flex align-items-center justify-content-center me-4" style="width: 70px; height: 70px;">
+                        <i class="fa-solid fa-clock-rotate-left fa-2x"></i>
+                    </div>
+                    <div>
+                        <h1 class="fw-900 text-dark mb-0" style="letter-spacing: -2px;">Schedule Visit</h1>
+                        <p class="text-muted mb-0">Hello, <strong>{{ current_user.full_name }}</strong>. Please select your slot below.</p>
+                    </div>
+                </div>
+
+                <form action="/book" method="POST" id="bookingForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row g-4">
+                        <!-- Step 1: Service -->
+                        <div class="col-md-12">
+                            <label class="form-label small fw-900 text-secondary tracking-widest text-uppercase">1. Select Service Type</label>
+                            <div class="input-group bento-input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4 ps-3">
+                                    <i class="fa-solid fa-gears text-primary"></i>
+                                </span>
+                                <select name="service_type" class="form-select form-control-lg border-0 bg-light rounded-end-4 shadow-none p-3 fs-6 fw-bold">
+                                    <option value="Sales">Sales & New Unit Inquiry</option>
+                                    <option value="Technical">Technical Service / Repair</option>
+                                    <option value="Warranty">Warranty Claim</option>
+                                    <option value="Parts">Parts & Accessories Pickup</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Date (Monthly Picker) -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-900 text-secondary tracking-widest text-uppercase">2. Preferred Date</label>
+                            <div class="input-group bento-input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4 ps-3">
+                                    <i class="fa-solid fa-calendar-day text-primary"></i>
+                                </span>
+                                <input type="text" id="datePicker" placeholder="Tap to select date" readonly
+                                       class="form-control form-control-lg border-0 bg-light rounded-end-4 shadow-none p-3 fs-6 fw-bold cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Time (Scroll Picker) -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-900 text-secondary tracking-widest text-uppercase">3. Preferred Time</label>
+                            <div class="input-group bento-input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4 ps-3">
+                                    <i class="fa-solid fa-clock text-primary"></i>
+                                </span>
+                                <input type="text" id="timePicker" placeholder="Tap to select time" readonly
+                                       class="form-control form-control-lg border-0 bg-light rounded-end-4 shadow-none p-3 fs-6 fw-bold cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- HIDDEN INPUT: Merged value for backend -->
+                        <input type="hidden" name="time" id="finalDateTime">
+                    </div>
+
+                    <!-- Priority Info Box -->
+                    <div class="mt-5 p-4 rounded-4 d-flex align-items-center" style="background: #eef2ff; border-left: 6px solid #002d72;">
+                        <i class="fa-solid fa-circle-info text-primary fa-2x me-4"></i>
+                        <p class="small text-dark mb-0 fw-medium">
+                            <strong>Priority Access:</strong> Booking online grants you an <strong>"A" ticket</strong>, placing you ahead of walk-ins automatically.
+                        </p>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary btn-modern w-100 py-4 fs-4 shadow-lg border-0" id="confirmBtn">
+                            <span>CONFIRM APPOINTMENT</span>
+                            <i class="fa-solid fa-paper-plane ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar same as before -->
+    <div class="col-lg-4 d-none d-lg-block">
+        <div class="bento-card bg-dark text-white p-4 mb-4">
+            <h5 class="fw-900 mb-4 text-warning">Member Benefits</h5>
+            <div class="d-flex mb-4">
+                <div class="rounded-3 bg-white bg-opacity-10 p-3 me-3"><i class="fa-solid fa-bolt-lightning text-warning"></i></div>
+                <div><h6 class="fw-bold mb-1">Priority Lane</h6><p class="small text-white-50 mb-0">Skip general queues.</p></div>
+            </div>
+        </div>
+        <div class="bento-card p-4 border-0 text-white" style="background: linear-gradient(135deg, #002d72, #0052cc);">
+            <h5 class="fw-900">Encrypted</h5>
+            <p class="small opacity-75">Your data is secured with 256-bit SSL encryption.</p>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- GUEST VIEW -->
+    <div class="col-lg-6">
+        <div class="bento-card text-center p-5 shadow-deep border-0 bg-white">
+            <i class="fa-solid fa-user-lock fa-4x text-primary mb-4"></i>
+            <h1 class="fw-900">Client Portal</h1>
+            <p class="text-muted mb-5">Sign in to book and get priority status.</p>
+            <div class="d-grid gap-3 px-md-5">
+                <a href="/login" class="btn btn-primary btn-modern py-4 shadow-lg fs-5">SIGN IN TO BOOK</a>
+                <a href="/register" class="btn btn-outline-dark btn-modern py-3">NEW ACCOUNT</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- 2. JAVASCRIPT: FLAT PICKR LOGIC -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    // Initialize Date Picker (Monthly Calendar)
+    const dateFP = flatpickr("#datePicker", {
+        minDate: "today",
+        maxDate: new Date().fp_incr(30), // Allow 30 days ahead
+        dateFormat: "Y-m-d",
+        disable: [ (date) => (date.getDay() === 0) ], // Disable Sundays
+        onChange: combineInputs
+    });
+
+    // Initialize Time Picker (Scrollable)
+    const timeFP = flatpickr("#timePicker", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: false,
+        minTime: "08:00",
+        maxTime: "17:00",
+        minuteIncrement: 30,
+        onChange: combineInputs
+    });
+
+    // Function to merge Date and Time for Flask Backend
+    function combineInputs() {
+        const d = document.getElementById('datePicker').value;
+        const t = document.getElementById('timePicker').value;
+        if (d && t) {
+            // Converts to YYYY-MM-DDTHH:MM (Format expected by datetime.strptime)
+            document.getElementById('finalDateTime').value = d + 'T' + t;
+        }
+    }
+
+    // Interaction UX
+    const form = document.getElementById('bookingForm');
+    if(form) {
+        form.onsubmit = function(e) {
+            if(!document.getElementById('finalDateTime').value) {
+                alert("Please select both a Date and a Time.");
+                e.preventDefault();
+                return;
+            }
+            const btn = document.getElementById('confirmBtn');
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+        }
+    }
+</script>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .cursor-pointer { cursor: pointer !important; }
+    .shadow-deep { box-shadow: 0 40px 100px rgba(0,0,0,0.08); }
+
+    /* Bento Input Style */
+    .bento-input-group {
+        border: 2px solid transparent;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .bento-input-group:focus-within {
+        border-color: rgba(0, 45, 114, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* Override Flatpickr Styling to match Coolaire */
+    .flatpickr-calendar {
+        border-radius: 20px !important;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1) !important;
+        border: none !important;
+    }
+    .flatpickr-day.selected { background: #002d72 !important; border-color: #002d72 !important; }
+
+    /* Loading Spinner */
+    .btn-loading::after {
+        content: ""; width: 20px; height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top-color: #fff; border-radius: 50%;
+        animation: spin 0.8s linear infinite; display: inline-block; margin-left: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}

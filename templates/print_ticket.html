@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Printing...</title>
+    <style>
+        /* receipt-size styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            width: 80mm; /* Standard thermal width */
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
+        .ticket-num { font-size: 50px; font-weight: bold; margin: 10px 0; }
+        .footer { font-size: 12px; margin-top: 20px; border-top: 1px dashed #000; padding-top: 10px; }
+
+        /* Ensure only the receipt prints */
+        @media print {
+            @page { margin: 0; }
+            body { margin: 0.5cm; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt">
+        <h2 style="margin:0;">COOLAIRE</h2>
+        <p style="margin:0;">Smart Queue Ticket</p>
+        <hr>
+        <div style="margin-top: 15px;">YOUR NUMBER:</div>
+        <div class="ticket-num">{{ ticket.ticket_number }}</div>
+        <div style="font-size: 14px;">{{ ticket.created_at.strftime('%m/%d/%Y %I:%M %p') }}</div>
+
+        <div class="footer">
+            Please watch the TV display.<br>
+            Thank you for choosing Coolaire!
+        </div>
+    </div>
+
+    <script>
+    window.onload = function() {
+        window.print();
+        // Wait 1.5 seconds to ensure the print dialog is handled, then go home
+        setTimeout(function() {
+            window.location.href = "/";
+        }, 1500);
+    };
+</script>
+
+</body>
+</html>

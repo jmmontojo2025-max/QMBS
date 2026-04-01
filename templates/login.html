@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center page-fade-in" style="min-height: 85vh;">
+    <div class="col-xl-11">
+        <!-- Main Bento Wrapper (Split Layout) -->
+        <div class="bento-card p-0 overflow-hidden shadow-deep border-0 d-flex flex-column flex-lg-row bg-white">
+
+            <!-- Left Side: Brand Experience -->
+            <div class="p-5 text-white d-flex flex-column justify-content-between position-relative"
+                 style="flex: 1; background: linear-gradient(135deg, #002d72 0%, #001d4a 100%); min-height: 450px;">
+
+                <!-- Background Pattern (Matching Registration) -->
+                <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10"
+                     style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+
+                <div class="position-relative z-index-1">
+                    <span class="badge rounded-pill mb-4 px-3 py-2" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);">
+                        <i class="fa-solid fa-lock me-2 text-warning"></i>Secure Portal Access
+                    </span>
+                    <h1 class="display-4 fw-900 mb-3" style="letter-spacing: -2px;">Welcome Back.</h1>
+                    <p class="lead opacity-75">Access the Coolaire Smart Queuing Portal to manage your appointments, track service history, and view real-time status updates.</p>
+                </div>
+
+                <!-- Features List (Matching Registration Style) -->
+                <div class="mt-5 position-relative z-index-1">
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px; flex-shrink: 0;">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Instant Booking</h6>
+                            <small class="opacity-60">Schedule your next refrigeration check-up in seconds.</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px; flex-shrink: 0;">
+                            <i class="fa-solid fa-tv"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Live Status</h6>
+                            <small class="opacity-60">Monitor your position in the queue from any device.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="position-relative z-index-1 pt-4 border-top border-white border-opacity-10 mt-5">
+                    <p class="small opacity-50 mb-0">&copy; 2024 Coolaire Consolidated Inc. All Rights Reserved.</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="p-4 p-md-5 bg-white d-flex flex-column justify-content-center" style="flex: 1.5;">
+                <form action="/login" method="POST" id="loginForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-5">
+                        <h3 class="fw-900 text-dark mb-0">Client Login</h3>
+                        <p class="text-muted small mb-0">Enter your credentials to access the network</p>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Username -->
+                        <div class="col-12">
+                            <label class="form-label small fw-900 text-secondary tracking-widest text-uppercase">Username</label>
+                            <div class="input-group bento-input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4 ps-3">
+                                    <i class="fa-solid fa-user-circle text-muted"></i>
+                                </span>
+                                <input type="text" name="username"
+                                       class="form-control form-control-lg border-0 bg-light rounded-end-4 shadow-none p-3"
+                                       placeholder="Enter your username" required>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label class="form-label small fw-900 text-secondary tracking-widest text-uppercase">Password</label>
+                                <a href="#" class="text-decoration-none small fw-bold text-primary mb-2">Forgot?</a>
+                            </div>
+                            <div class="input-group bento-input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4 ps-3">
+                                    <i class="fa-solid fa-key text-muted"></i>
+                                </span>
+                                <input type="password" name="password" id="loginPassword"
+                                       class="form-control form-control-lg border-0 bg-light shadow-none p-3"
+                                       placeholder="••••••••" required>
+                                <span class="input-group-text border-0 bg-light rounded-end-4 pe-3" style="cursor: pointer;" onclick="toggleLoginPassword()">
+                                    <i class="fa-solid fa-eye text-muted" id="loginToggleIcon"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary btn-modern w-100 py-4 fs-4 shadow-lg border-0" id="loginSubmitBtn">
+                            <span>SIGN IN TO PORTAL</span>
+                            <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <p class="text-muted small mb-0">Not part of the network yet?
+                            <a href="/register" class="text-primary fw-900 text-decoration-none ms-1">Create Account <i class="fa-solid fa-chevron-right small"></i></a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Security Badge -->
+        <div class="text-center mt-4 opacity-75">
+            <div class="d-inline-flex align-items-center bg-white px-4 py-2 rounded-pill shadow-sm border">
+                <i class="fa-solid fa-shield-halved text-success me-2"></i>
+                <small class="text-muted fw-bold text-uppercase tracking-wider">SSL Encrypted Secure Access</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .shadow-deep { box-shadow: 0 40px 100px rgba(0,0,0,0.1); }
+    .tracking-widest { letter-spacing: 0.15em; }
+
+    /* Bento Input Styles (Consistent with Registration) */
+    .bento-input-group {
+        border: 2px solid transparent;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+    .bento-input-group:focus-within {
+        border-color: rgba(0, 45, 114, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* Button Styling */
+    .btn-modern {
+        border-radius: 20px;
+        font-weight: 900;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .btn-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0, 45, 114, 0.2) !important;
+    }
+
+    /* Button Loading State */
+    .btn-loading span { display: none; }
+    .btn-loading::after {
+        content: ""; width: 24px; height: 24px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top-color: #fff; border-radius: 50%;
+        animation: spin 0.8s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 991px) {
+        .display-4 { font-size: 2.8rem; }
+        .bento-card { border-radius: 0 !important; margin: -25px; }
+    }
+</style>
+
+<script>
+    // 1. Password Toggle
+    function toggleLoginPassword() {
+        const input = document.getElementById('loginPassword');
+        const icon = document.getElementById('loginToggleIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    // 2. Submit Loading
+    document.getElementById('loginForm').onsubmit = function() {
+        const btn = document.getElementById('loginSubmitBtn');
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+    };
+</script>
+{% endblock %}
